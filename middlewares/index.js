@@ -1,4 +1,9 @@
-const { routeNotFoundMiddleware } = require('./no-route-middleware');
-const { errorHandlingMiddle } = require('./error-handling-middleware');
+const routeNotFoundMiddleware = require('./no-route-middleware');
+const errorHandlingMiddleware = require('./error-handling-middleware');
+const validateMongodbId = require('./validate-mongodb-id-middleware');
 
-module.exports = { routeNotFoundMiddleware, errorHandlingMiddle };
+module.exports = {
+  routeNotFoundMiddleware,
+  errorHandlingMiddleware,
+  validateMongodbId,
+};

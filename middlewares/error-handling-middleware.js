@@ -1,7 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const logger = require('../logger');
 
-exports.errorHandlingMiddle = (err, req, res, next) => {
+const errorHandlingMiddleware = (err, req, res, next) => {
   res.status(err.httpCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
     success: false,
     errors:
@@ -15,3 +15,5 @@ exports.errorHandlingMiddle = (err, req, res, next) => {
 
   return next(err);
 };
+
+module.exports = errorHandlingMiddleware;

@@ -6,7 +6,7 @@ const { authRoutes, userRoutes } = require('./routes');
 const logger = require('./logger');
 const {
   routeNotFoundMiddleware,
-  errorHandlingMiddle,
+  errorHandlingMiddleware,
 } = require('./middlewares');
 
 const app = express();
@@ -31,7 +31,7 @@ app.use('/api/v1/users', userRoutes);
 
 // error handler
 app.use(routeNotFoundMiddleware);
-app.use(errorHandlingMiddle);
+app.use(errorHandlingMiddleware);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
