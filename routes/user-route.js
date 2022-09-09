@@ -4,6 +4,7 @@ const {
   removeUser,
   getUserDetails,
   getUserProfile,
+  updateUser,
 } = require('../controllers/user-controller');
 const { validateMongodbId, authMiddleware } = require('../middlewares');
 
@@ -11,7 +12,10 @@ const router = express.Router();
 
 router.get('/', getAllUsers);
 
-router.get('/profile', authMiddleware, getUserProfile);
+router
+  .route('/profile')
+  .get(authMiddleware, getUserProfile)
+  .put(authMiddleware, updateUser);
 
 router
   .route('/:id')

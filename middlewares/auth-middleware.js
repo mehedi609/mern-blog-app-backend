@@ -23,19 +23,25 @@ const authMiddleware = expressAsyncHandler(async (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
         };
-        next();
+        return next();
       } else {
-        next(new UnauthorizedError('There is no token attached to the header'));
+        return next(
+          new UnauthorizedError('There is no token attached to the header'),
+        );
       }
     } catch (error) {
       logger.error(error);
-      next(
+      return next(
         new UnauthorizedError(
           'Not authorized! token invalid or expired, login again',
         ),
       );
     }
   }
+
+  return next(
+    new UnauthorizedError('There is no token attached to the header'),
+  );
 });
 
 module.exports = authMiddleware;

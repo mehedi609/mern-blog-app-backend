@@ -32,4 +32,28 @@ const getUserProfile = expressAsyncHandler(async (req, res) => {
   res.status(StatusCodes.OK).json(user);
 });
 
-module.exports = { getAllUsers, removeUser, getUserDetails, getUserProfile };
+// update logged-in user profile
+const updateUser = expressAsyncHandler(async (req, res) => {
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      firstName: req?.body?.firstName,
+      lastName: req?.body?.lastName,
+      email: req?.body?.email,
+      bio: req?.body?.bio,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  res.json(user);
+});
+
+module.exports = {
+  getAllUsers,
+  removeUser,
+  getUserDetails,
+  getUserProfile,
+  updateUser,
+};
