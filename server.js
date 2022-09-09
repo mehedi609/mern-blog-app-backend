@@ -1,16 +1,13 @@
 require('dotenv').config();
 const express = require('express');
-const dbConnect = require('./config/dbConnect');
-const { authRoutes } = require('./routes/auth-route');
-const { userRoutes } = require('./routes/user-route');
-const {
-  errorHandlingMiddle,
-} = require('./middlewares/error-handling-middleware');
+const morgan = require('morgan');
+const { dbConnect } = require('./config');
+const { authRoutes, userRoutes } = require('./routes');
+const logger = require('./logger');
 const {
   routeNotFoundMiddleware,
-} = require('./middlewares/no-route-middleware');
-const morgan = require('morgan');
-const logger = require('./logger');
+  errorHandlingMiddle,
+} = require('./middlewares');
 
 const app = express();
 

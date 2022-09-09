@@ -1,6 +1,6 @@
 const expressAsyncHandler = require('express-async-handler');
-const User = require('../model/User');
 const { StatusCodes } = require('http-status-codes');
+const { User } = require('../model');
 
 // get all users
 const getAllUsers = expressAsyncHandler(async (req, res) => {
