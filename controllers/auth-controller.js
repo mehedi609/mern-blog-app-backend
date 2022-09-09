@@ -22,6 +22,7 @@ exports.register = expressAsyncHandler(async (req, res, next) => {
   res.status(StatusCodes.CREATED).json(user);
 });
 
+// login
 exports.login = expressAsyncHandler(async (req, res, next) => {
   const { email, password } = req?.body;
 
