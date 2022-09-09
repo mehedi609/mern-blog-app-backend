@@ -26,4 +26,10 @@ const getUserDetails = expressAsyncHandler(async (req, res) => {
   res.status(StatusCodes.OK).json(user);
 });
 
-module.exports = { getAllUsers, removeUser, getUserDetails };
+// get logged-in user details
+const getUserProfile = expressAsyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  res.status(StatusCodes.OK).json(user);
+});
+
+module.exports = { getAllUsers, removeUser, getUserDetails, getUserProfile };
