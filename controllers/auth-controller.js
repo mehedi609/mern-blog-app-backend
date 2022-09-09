@@ -10,6 +10,7 @@ exports.register = async (req, res) => {
       email: req?.body?.email,
       password: req?.body?.password,
     });
+
     res.json(user);
   } catch (error) {
     res.json(error);
