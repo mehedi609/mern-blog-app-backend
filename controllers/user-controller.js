@@ -2,6 +2,7 @@ const expressAsyncHandler = require('express-async-handler');
 const { StatusCodes } = require('http-status-codes');
 const { User } = require('../model');
 const logger = require('../logger');
+const { BadRequestError } = require('../errors');
 
 // get all users
 const getAllUsers = expressAsyncHandler(async (req, res) => {
@@ -67,6 +68,60 @@ const updateUserPassword = expressAsyncHandler(async (req, res) => {
   }
 });
 
+const followingUser = expressAsyncHandler(async (req, res, next) => {
+  const { followId } = req.body;
+  const loginUserId = req.user.id;
+
+  // check if the user is already following the target user
+  const alreadyFollowing = req.user.following.some(
+    (userId) => userId.toString() === followId.toString(),
+  );
+  if (alreadyFollowing)
+    return next(new BadRequestError('You have already followed this user'));
+
+  //1. Find the user you want to follow and update it's followers field
+  await User.findByIdAndUpdate(followId, {
+    $push: { followers: loginUserId },
+    isFollowing: true,
+  });
+
+  //2. Update the login user following field
+  await User.findByIdAndUpdate(loginUserId, {
+    $push: { following: followId },
+  });
+
+  res
+    .status(StatusCodes.OK)
+    .json({ message: 'You have successfully followed this user' });
+});
+
+const unFollowUser = expressAsyncHandler(async (req, res, next) => {
+  const { unfollowIn } = req.body;
+  const loginUserId = req.user.id;
+
+  // check if the user is following the target user
+  const isFollowing = req.user.following.some(
+    (userId) => userId.toString() === unfollowIn.toString(),
+  );
+  if (!isFollowing)
+    return next(new BadRequestError('You are not following this user'));
+
+  //1. Find the user you want to follow and update it's followers field
+  await User.findByIdAndUpdate(unfollowIn, {
+    $pull: { followers: loginUserId },
+    isFollowing: false,
+  });
+
+  //2. Update the login user following field
+  await User.findByIdAndUpdate(loginUserId, {
+    $pull: { following: unfollowIn },
+  });
+
+  res
+    .status(StatusCodes.OK)
+    .json({ message: 'You have successfully unFollow this user' });
+});
+
 module.exports = {
   getAllUsers,
   removeUser,
@@ -74,4 +129,6 @@ module.exports = {
   getUserProfile,
   updateUser,
   updateUserPassword,
+  followingUser,
+  unFollowUser,
 };
