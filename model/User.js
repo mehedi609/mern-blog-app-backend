@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const mongooseHidden = require('mongoose-hidden')();
 
 //create schema
 const userSchema = new mongoose.Schema(
@@ -113,6 +114,8 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+userSchema.plugin(mongooseHidden);
 
 //Compile schema into model
 const User = mongoose.model('User', userSchema);

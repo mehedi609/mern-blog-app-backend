@@ -3,6 +3,7 @@ const expressAsyncHandler = require('express-async-handler');
 const BadRequestError = require('../errors/bad-request-error');
 const { StatusCodes } = require('http-status-codes');
 const UnauthorizedError = require('../errors/unauthorized-error');
+const generateToken = require('../utils/generateToken');
 
 //Register
 exports.register = expressAsyncHandler(async (req, res, next) => {
@@ -29,7 +30,14 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
 
   //Check if password is match
   if (userFound && (await userFound.isPasswordMatched(password))) {
-    return res.status(StatusCodes.OK).json(userFound);
+    return res.status(StatusCodes.OK).json({
+      firstName: userFound?.firstName,
+      lastName: userFound?.lastName,
+      email: userFound?.email,
+      profilePhoto: userFound?.profilePhoto,
+      isAdmin: userFound?.isAdmin,
+      token: generateToken(userFound?.id),
+    });
   }
 
   return next(new UnauthorizedError('Invalid credentials'));
