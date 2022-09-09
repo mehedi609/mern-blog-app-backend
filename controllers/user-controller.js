@@ -10,7 +10,7 @@ const getAllUsers = expressAsyncHandler(async (req, res) => {
   return res.status(StatusCodes.OK).json(users);
 });
 
-//Delete user
+// delete user by id
 const removeUser = expressAsyncHandler(async (req, res) => {
   const { id } = req?.params;
 
