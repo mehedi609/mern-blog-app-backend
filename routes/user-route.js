@@ -5,12 +5,14 @@ const {
   getUserDetails,
   getUserProfile,
   updateUser,
+  updateUserPassword,
 } = require('../controllers/user-controller');
 const { validateMongodbId, authMiddleware } = require('../middlewares');
 
 const router = express.Router();
 
 router.get('/', getAllUsers);
+router.put('/password', authMiddleware, updateUserPassword);
 
 router
   .route('/profile')

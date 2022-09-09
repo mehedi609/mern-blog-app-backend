@@ -47,7 +47,24 @@ const updateUser = expressAsyncHandler(async (req, res) => {
       runValidators: true,
     },
   );
-  res.json(user);
+  res.status(StatusCodes.OK).json(user);
+});
+
+// update user password
+const updateUserPassword = expressAsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { password } = req.body;
+
+  //Find the user by _id
+  const user = await User.findById(id);
+
+  if (password) {
+    user.password = password;
+    const updatedUser = await user.save();
+    res.status(StatusCodes.OK).json(updatedUser);
+  } else {
+    res.status(StatusCodes.OK).json(user);
+  }
 });
 
 module.exports = {
@@ -56,4 +73,5 @@ module.exports = {
   getUserDetails,
   getUserProfile,
   updateUser,
+  updateUserPassword,
 };
