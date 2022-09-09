@@ -18,4 +18,12 @@ const removeUser = expressAsyncHandler(async (req, res) => {
   res.status(StatusCodes.OK).json(deletedUser);
 });
 
-module.exports = { getAllUsers, removeUser };
+// get user details by id
+const getUserDetails = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+  res.status(StatusCodes.OK).json(user);
+});
+
+module.exports = { getAllUsers, removeUser, getUserDetails };
