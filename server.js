@@ -8,6 +8,8 @@ const {
 const {
   routeNotFoundMiddleware,
 } = require('./middlewares/no-route-middleware');
+const morgan = require('morgan');
+const logger = require('./logger');
 
 const app = express();
 
@@ -16,6 +18,11 @@ dbConnect();
 
 // Middleware
 app.use(express.json());
+app.use(
+  morgan('tiny', {
+    stream: { write: (message) => logger.info(message.trim()) },
+  }),
+);
 
 // auth route
 app.use('/api/v1/auth', userRouter);
