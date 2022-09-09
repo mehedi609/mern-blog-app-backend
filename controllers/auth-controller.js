@@ -1,9 +1,8 @@
-const User = require('../model/User');
-const expressAsyncHandler = require('express-async-handler');
-const BadRequestError = require('../errors/bad-request-error');
 const { StatusCodes } = require('http-status-codes');
-const UnauthorizedError = require('../errors/unauthorized-error');
-const generateToken = require('../utils/generateToken');
+const expressAsyncHandler = require('express-async-handler');
+const { BadRequestError, UnauthorizedError } = require('../errors');
+const { generateToken } = require('../utils');
+const { User } = require('../model');
 
 //Register
 exports.register = expressAsyncHandler(async (req, res, next) => {
@@ -22,6 +21,7 @@ exports.register = expressAsyncHandler(async (req, res, next) => {
   res.status(StatusCodes.CREATED).json(user);
 });
 
+// login
 exports.login = expressAsyncHandler(async (req, res, next) => {
   const { email, password } = req?.body;
 
