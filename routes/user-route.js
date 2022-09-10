@@ -12,6 +12,8 @@ const {
   unBlockUser,
   sendVerificationEmail,
   accountVerify,
+  forgetPassword,
+  resetPassword,
 } = require('../controllers/user-controller');
 const { validateMongodbId, authMiddleware } = require('../middlewares');
 
@@ -25,6 +27,8 @@ router.put('/block-user', authMiddleware, blockUser);
 router.put('/unblock-user', authMiddleware, unBlockUser);
 router.post('/send-verify-email', authMiddleware, sendVerificationEmail);
 router.put('/verify-account', authMiddleware, accountVerify);
+router.post('/send-forget-password', forgetPassword);
+router.put('/reset-password', resetPassword);
 
 router
   .route('/profile')

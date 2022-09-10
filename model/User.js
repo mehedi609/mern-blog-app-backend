@@ -132,6 +132,15 @@ userSchema.methods.createAccountVerificationToken = async function (id) {
   return verificationToken;
 };
 
+// generate password reset token
+userSchema.methods.createPasswordResetToken = async function (id) {
+  //create a token
+  const verificationToken = generateToken(id, '10min');
+  this.passwordResetToken = verificationToken;
+  this.passwordResetExpires = dayjs().add(10, 'minute');
+  return verificationToken;
+};
+
 userSchema.plugin(mongooseHidden);
 
 //Compile schema into model
