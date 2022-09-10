@@ -3,8 +3,12 @@ const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
 const { User } = require('../model');
 const logger = require('../logger');
-const { BadRequestError, UnauthorizedError } = require('../errors');
-const { sendEmail } = require('../utils');
+const {
+  BadRequestError,
+  UnauthorizedError,
+  NotFoundError,
+} = require('../errors');
+const { sendEmail, EMAIL_TEMPLATE_NAME } = require('../utils');
 const dayjs = require('dayjs');
 
 // get all users
@@ -152,7 +156,7 @@ const unBlockUser = expressAsyncHandler(async (req, res) => {
   res.status(StatusCodes.OK).json(user);
 });
 
-// send account verification token via email
+// generate and send account verification token via email
 const sendVerificationEmail = expressAsyncHandler(async (req, res, next) => {
   const loginUserId = req.user.id;
 
@@ -173,10 +177,12 @@ const sendVerificationEmail = expressAsyncHandler(async (req, res, next) => {
 
   await user.save();
 
-  await sendEmail(user.email, {
-    name: user.firstName,
-    url: `${process.env.BASE_URL_FRONTEND}/verify-account/${verificationToken}`,
-  });
+  await sendEmail(
+    user.email,
+    user.firstName,
+    `${process.env.BASE_URL_FRONTEND}/verify-account/${verificationToken}`,
+    EMAIL_TEMPLATE_NAME.account_verification,
+  );
 
   res.status(StatusCodes.OK).json({
     message:
@@ -199,28 +205,91 @@ const accountVerify = expressAsyncHandler(async (req, res, next) => {
       );
     }
 
-    /*    const userFound = await User.findById(decoded?.id).select('-password');
+    const user = await User.findById(decoded.id);
 
-    //update the proprt to true
-    userFound.isAccountVerified = true;
-    userFound.accountVerificationToken = undefined;
-    userFound.accountVerificationTokenExpires = undefined;
-    // await userFound.save();*/
+    if (!user)
+      return next(new NotFoundError(`User with id ${decoded.id} not found!`));
+    else if (!user.accountVerificationToken)
+      return next(
+        new UnauthorizedError(
+          'Not authorized! token invalid or expired, try again',
+        ),
+      );
 
-    const updatedUser = await User.findByIdAndUpdate(
-      decoded.id,
-      {
-        isAccountVerified: true,
-        accountVerificationToken: null,
-        accountVerificationTokenExpires: null,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
+    user.isAccountVerified = true;
+    user.accountVerificationToken = undefined;
+    user.accountVerificationTokenExpires = undefined;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json(user);
+  } catch (error) {
+    logger.error(error);
+    return next(
+      new UnauthorizedError(
+        'Not authorized! token invalid or expired, try again',
+      ),
+    );
+  }
+});
+
+// generate and send forget password token to email
+const forgetPassword = expressAsyncHandler(async (req, res, next) => {
+  //find the user by email
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user)
+    return next(new NotFoundError(`User with email ${email} not found!`));
+
+  if (dayjs().isBefore(dayjs(user.passwordResetExpires)))
+    return next(
+      new BadRequestError(
+        'Password reset token has already been sent. Please check your email',
+      ),
     );
 
-    res.status(StatusCodes.OK).json(updatedUser);
+  const resetToken = await user.createPasswordResetToken(user.id);
+
+  await user.save();
+
+  await sendEmail(
+    user.email,
+    user.firstName,
+    `${process.env.BASE_URL_FRONTEND}/reset-password/${resetToken}`,
+    EMAIL_TEMPLATE_NAME.password_reset,
+  );
+
+  res.status(StatusCodes.OK).json({
+    message: `Password reset token is successfully sent to ${user?.email}. Reset now within 10 minutes`,
+  });
+});
+
+// reset password
+const resetPassword = expressAsyncHandler(async (req, res, next) => {
+  const { token, password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
+
+    const user = await User.findById(decoded.id);
+
+    if (!user)
+      return next(new NotFoundError(`User with id ${decoded.id} not found!`));
+    else if (!user.passwordResetToken)
+      return next(
+        new UnauthorizedError(
+          'Not authorized! token invalid or expired, try again',
+        ),
+      );
+
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json(user);
   } catch (error) {
     logger.error(error);
     return next(
@@ -244,4 +313,6 @@ module.exports = {
   unBlockUser,
   sendVerificationEmail,
   accountVerify,
+  forgetPassword,
+  resetPassword,
 };
