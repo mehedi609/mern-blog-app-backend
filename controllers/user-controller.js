@@ -1,8 +1,9 @@
 const expressAsyncHandler = require('express-async-handler');
 const { StatusCodes } = require('http-status-codes');
+const jwt = require('jsonwebtoken');
 const { User } = require('../model');
 const logger = require('../logger');
-const { BadRequestError } = require('../errors');
+const { BadRequestError, UnauthorizedError } = require('../errors');
 const { sendEmail } = require('../utils');
 const dayjs = require('dayjs');
 
@@ -183,6 +184,53 @@ const sendVerificationEmail = expressAsyncHandler(async (req, res, next) => {
   });
 });
 
+// verify and activate account
+const accountVerify = expressAsyncHandler(async (req, res, next) => {
+  const { token } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
+
+    if (decoded?.id.toString() !== req.user.id.toString()) {
+      return next(
+        new UnauthorizedError(
+          'You are not authorized to activate this account.',
+        ),
+      );
+    }
+
+    /*    const userFound = await User.findById(decoded?.id).select('-password');
+
+    //update the proprt to true
+    userFound.isAccountVerified = true;
+    userFound.accountVerificationToken = undefined;
+    userFound.accountVerificationTokenExpires = undefined;
+    // await userFound.save();*/
+
+    const updatedUser = await User.findByIdAndUpdate(
+      decoded.id,
+      {
+        isAccountVerified: true,
+        accountVerificationToken: null,
+        accountVerificationTokenExpires: null,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    res.status(StatusCodes.OK).json(updatedUser);
+  } catch (error) {
+    logger.error(error);
+    return next(
+      new UnauthorizedError(
+        'Not authorized! token invalid or expired, try again',
+      ),
+    );
+  }
+});
+
 module.exports = {
   getAllUsers,
   removeUser,
@@ -195,4 +243,5 @@ module.exports = {
   blockUser,
   unBlockUser,
   sendVerificationEmail,
+  accountVerify,
 };
