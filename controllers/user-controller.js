@@ -1,6 +1,9 @@
 const expressAsyncHandler = require('express-async-handler');
 const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
+const dayjs = require('dayjs');
+const path = require('path');
+const fs = require('fs');
 const { User } = require('../model');
 const logger = require('../logger');
 const {
@@ -8,8 +11,11 @@ const {
   UnauthorizedError,
   NotFoundError,
 } = require('../errors');
-const { sendEmail, EMAIL_TEMPLATE_NAME } = require('../utils');
-const dayjs = require('dayjs');
+const {
+  sendEmail,
+  EMAIL_TEMPLATE_NAME,
+  uploadImgToCloudinary,
+} = require('../utils');
 
 // get all users
 const getAllUsers = expressAsyncHandler(async (req, res) => {
@@ -300,6 +306,32 @@ const resetPassword = expressAsyncHandler(async (req, res, next) => {
   }
 });
 
+const uploadProfileUpload = expressAsyncHandler(async (req, res, next) => {
+  try {
+    console.log(req.file.filename);
+    //1. Get the oath to img
+    const localPath = path.join(
+      'public/images/profile',
+      `${req.file.filename}`,
+    );
+    //2.Upload to cloudinary
+    const imgUploaded = await uploadImgToCloudinary(localPath);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { profilePhoto: imgUploaded.url },
+      { new: true },
+    );
+
+    fs.unlinkSync(localPath);
+
+    res.status(StatusCodes.OK).json(updatedUser);
+  } catch (error) {
+    logger.error(error);
+    return next(error);
+  }
+});
+
 module.exports = {
   getAllUsers,
   removeUser,
@@ -315,4 +347,5 @@ module.exports = {
   accountVerify,
   forgetPassword,
   resetPassword,
+  uploadProfileUpload,
 };

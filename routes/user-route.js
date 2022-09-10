@@ -14,8 +14,14 @@ const {
   accountVerify,
   forgetPassword,
   resetPassword,
+  uploadProfileUpload,
 } = require('../controllers/user-controller');
-const { validateMongodbId, authMiddleware } = require('../middlewares');
+const {
+  validateMongodbId,
+  authMiddleware,
+  photoUploadMiddleware,
+  profilePhotoResize,
+} = require('../middlewares');
 
 const router = express.Router();
 
@@ -29,6 +35,13 @@ router.post('/send-verify-email', authMiddleware, sendVerificationEmail);
 router.put('/verify-account', authMiddleware, accountVerify);
 router.post('/send-forget-password', forgetPassword);
 router.put('/reset-password', resetPassword);
+router.put(
+  '/upload-profile-photo',
+  authMiddleware,
+  photoUploadMiddleware.single('image'),
+  profilePhotoResize,
+  uploadProfileUpload,
+);
 
 router
   .route('/profile')
