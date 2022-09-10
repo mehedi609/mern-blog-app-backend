@@ -3,10 +3,11 @@ const { StatusCodes } = require('http-status-codes');
 const { User } = require('../model');
 const logger = require('../logger');
 const { BadRequestError } = require('../errors');
+const { sendEmail } = require('../utils');
+const dayjs = require('dayjs');
 
 // get all users
 const getAllUsers = expressAsyncHandler(async (req, res) => {
-  logger.info(req.params.id);
   const users = await User.find({});
   return res.status(StatusCodes.OK).json(users);
 });
@@ -122,6 +123,66 @@ const unFollowUser = expressAsyncHandler(async (req, res, next) => {
     .json({ message: 'You have successfully unFollow this user' });
 });
 
+// Block user
+const blockUser = expressAsyncHandler(async (req, res) => {
+  const { id } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: true,
+    },
+    { new: true },
+  );
+  res.status(StatusCodes.OK).json(user);
+});
+
+// Unblock user
+const unBlockUser = expressAsyncHandler(async (req, res) => {
+  const { id } = req.body;
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    {
+      isBlocked: false,
+    },
+    { new: true },
+  );
+  res.status(StatusCodes.OK).json(user);
+});
+
+// send account verification token via email
+const sendVerificationEmail = expressAsyncHandler(async (req, res, next) => {
+  const loginUserId = req.user.id;
+
+  const user = await User.findById(loginUserId);
+
+  if (dayjs().isBefore(dayjs(user.accountVerificationTokenExpires)))
+    return next(
+      new BadRequestError(
+        'Verification email has already been sent. Please check your email',
+      ),
+    );
+  else if (user.isAccountVerified)
+    return next(new BadRequestError('This account has already been verified'));
+
+  const verificationToken = await user.createAccountVerificationToken(
+    loginUserId,
+  );
+
+  await user.save();
+
+  await sendEmail(user.email, {
+    name: user.firstName,
+    url: `${process.env.BASE_URL_FRONTEND}/verify-account/${verificationToken}`,
+  });
+
+  res.status(StatusCodes.OK).json({
+    message:
+      'Verification email sent successfully. Please check your email to active your account.',
+  });
+});
+
 module.exports = {
   getAllUsers,
   removeUser,
@@ -131,4 +192,7 @@ module.exports = {
   updateUserPassword,
   followingUser,
   unFollowUser,
+  blockUser,
+  unBlockUser,
+  sendVerificationEmail,
 };

@@ -8,6 +8,9 @@ const {
   updateUserPassword,
   followingUser,
   unFollowUser,
+  blockUser,
+  unBlockUser,
+  sendVerificationEmail,
 } = require('../controllers/user-controller');
 const { validateMongodbId, authMiddleware } = require('../middlewares');
 
@@ -17,6 +20,9 @@ router.get('/', getAllUsers);
 router.put('/password', authMiddleware, updateUserPassword);
 router.put('/follow', authMiddleware, followingUser);
 router.put('/unfollow', authMiddleware, unFollowUser);
+router.put('/block-user', authMiddleware, blockUser);
+router.put('/unblock-user', authMiddleware, unBlockUser);
+router.post('/send-verify-email', authMiddleware, sendVerificationEmail);
 
 router
   .route('/profile')

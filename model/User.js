@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const dayjs = require('dayjs');
+const { generateToken } = require('../utils');
 const mongooseHidden = require('mongoose-hidden')();
 
 //create schema
@@ -113,6 +115,21 @@ userSchema.pre('save', async function (next) {
 //match password
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// generate token to verify account
+userSchema.methods.createAccountVerificationToken = async function (id) {
+  //create a token
+  /*const verificationToken = crypto.randomBytes(32).toString('hex');
+  this.accountVerificationToken = crypto
+    .createHash('sha256')
+    .update(verificationToken)
+    .digest('hex');
+  this.accountVerificationTokenExpires = Date.now() + 30 * 60 * 1000; //10 minutes*/
+  const verificationToken = generateToken(id, '10min');
+  this.accountVerificationToken = verificationToken;
+  this.accountVerificationTokenExpires = dayjs().add(10, 'minute');
+  return verificationToken;
 };
 
 userSchema.plugin(mongooseHidden);
