@@ -3,6 +3,7 @@ const expressAsyncHandler = require('express-async-handler');
 const { BadRequestError, UnauthorizedError } = require('../errors');
 const { generateToken } = require('../utils');
 const { User } = require('../model');
+const logger = require('../logger');
 
 //Register
 exports.register = expressAsyncHandler(async (req, res, next) => {
@@ -28,6 +29,8 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
   //check if user exists
   const userFound = await User.findOne({ email });
 
+  logger.info('User found: ' + (await userFound.isPasswordMatched(password)));
+
   //Check if password is match
   if (userFound && (await userFound.isPasswordMatched(password))) {
     return res.status(StatusCodes.OK).json({
@@ -36,7 +39,7 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
       email: userFound?.email,
       profilePhoto: userFound?.profilePhoto,
       isAdmin: userFound?.isAdmin,
-      token: generateToken(userFound?.id),
+      token: generateToken(userFound?.id, process.env.EXPIRES_IN),
     });
   }
 

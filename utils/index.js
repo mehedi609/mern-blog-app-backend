@@ -1,3 +1,4 @@
 const generateToken = require('./generateToken');
+const sendEmail = require('./send-email');
 
-module.exports = { generateToken };
+module.exports = { generateToken, sendEmail };
