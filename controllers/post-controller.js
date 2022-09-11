@@ -63,3 +63,9 @@ exports.createPost = expressAsyncHandler(async (req, res, next) => {
     return next(error);
   }
 });
+
+// fetch all posts
+exports.getAllPosts = expressAsyncHandler(async (req, res) => {
+  const posts = await Post.find({}).populate('user');
+  res.status(StatusCodes.OK).json(posts);
+});
