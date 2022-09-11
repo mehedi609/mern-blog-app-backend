@@ -20,7 +20,6 @@ const {
   validateMongodbId,
   authMiddleware,
   photoUploadMiddleware,
-  profilePhotoResize,
 } = require('../middlewares');
 
 const router = express.Router();
@@ -39,7 +38,6 @@ router.put(
   '/upload-profile-photo',
   authMiddleware,
   photoUploadMiddleware.single('image'),
-  profilePhotoResize,
   uploadProfileUpload,
 );
 
