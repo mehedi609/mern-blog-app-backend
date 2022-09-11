@@ -10,6 +10,8 @@ const {
   getPostsById,
   updatePost,
   deletePostById,
+  likePost,
+  dislikePost,
 } = require('../controllers/post-controller');
 
 const router = express.Router();
@@ -18,6 +20,9 @@ router
   .route('/')
   .post(authMiddleware, photoUploadMiddleware.single('image'), createPost)
   .get(authMiddleware, getAllPosts);
+
+router.put('/likes', authMiddleware, likePost);
+router.put('/dislikes', authMiddleware, dislikePost);
 
 router
   .route('/:id')

@@ -10,7 +10,7 @@ const {
   NotFoundError,
   UnauthorizedError,
 } = require('../errors');
-const { resizePhoto, uploadImgToCloudinary } = require('../utils');
+const { resizePhoto, uploadImgToCloudinary, hasChosen } = require('../utils');
 
 exports.createPost = expressAsyncHandler(async (req, res, next) => {
   try {
@@ -142,4 +142,95 @@ exports.deletePostById = expressAsyncHandler(async (req, res, next) => {
 
   const deletePost = await Post.findByIdAndDelete(id);
   res.status(StatusCodes.OK).json(deletePost);
+});
+
+exports.likePost = expressAsyncHandler(async (req, res, next) => {
+  const { postId } = req.body;
+  const loginUserId = req?.user?.id;
+
+  // Find the post to be liked
+  const post = await Post.findById(postId);
+
+  if (!post) return next(new NotFoundError(`No such post ${postId}`));
+
+  //3. Find is this user has liked this post?
+  const isLiked = post?.isLiked;
+
+  // if already liked, then remove user form likes arr
+  if (hasChosen(post.likes, loginUserId)) {
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $pull: { likes: loginUserId },
+        isLiked: false,
+      },
+      { new: true },
+    );
+
+    return res.status(StatusCodes.OK).json(updatedPost);
+  } else {
+    // if already disliked remove user from dislikes arr
+    if (hasChosen(post?.disLikes, loginUserId)) {
+      await Post.findByIdAndUpdate(postId, {
+        $pull: { disLikes: loginUserId },
+        isLiked: false,
+      });
+    }
+
+    // now like the post
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: { likes: loginUserId },
+        isLiked: true,
+      },
+      { new: true },
+    );
+
+    return res.status(StatusCodes.OK).json(updatedPost);
+  }
+});
+
+exports.dislikePost = expressAsyncHandler(async (req, res, next) => {
+  const { postId } = req.body;
+  const loginUserId = req?.user?.id;
+
+  // Find the post to be liked
+  const post = await Post.findById(postId);
+
+  if (!post) return next(new NotFoundError(`No such post ${postId}`));
+
+  // if already disLiked, then remove user form dislikes arr
+  if (hasChosen(post?.disLikes, loginUserId)) {
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $pull: { disLikes: loginUserId },
+        isDisLiked: false,
+      },
+      { new: true },
+    );
+
+    return res.status(StatusCodes.OK).json(updatedPost);
+  } else {
+    // if already liked remove user from likes arr
+    if (hasChosen(post?.likes, loginUserId)) {
+      await Post.findByIdAndUpdate(postId, {
+        $pull: { likes: loginUserId },
+        isLiked: false,
+      });
+    }
+
+    // now disLike the post
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: { disLikes: loginUserId },
+        isDisLiked: true,
+      },
+      { new: true },
+    );
+
+    return res.status(StatusCodes.OK).json(updatedPost);
+  }
 });
