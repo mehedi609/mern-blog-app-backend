@@ -43,7 +43,7 @@ const getUserDetails = expressAsyncHandler(async (req, res) => {
 
 // get logged-in user details
 const getUserProfile = expressAsyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate('posts');
   res.status(StatusCodes.OK).json(user);
 });
 

@@ -46,7 +46,7 @@ exports.createPost = expressAsyncHandler(async (req, res, next) => {
     const newPost = new Post({
       ...req.body,
       title: req.body.title.trim().toLowerCase(),
-      user: req.user.id,
+      author: req.user.id,
     });
 
     if (postImageUrl) newPost.image = postImageUrl;
@@ -66,6 +66,6 @@ exports.createPost = expressAsyncHandler(async (req, res, next) => {
 
 // fetch all posts
 exports.getAllPosts = expressAsyncHandler(async (req, res) => {
-  const posts = await Post.find({}).populate('user');
+  const posts = await Post.find({}).populate('author');
   res.status(StatusCodes.OK).json(posts);
 });

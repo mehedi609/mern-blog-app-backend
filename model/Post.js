@@ -38,7 +38,7 @@ const postSchema = new mongoose.Schema(
         ref: 'User',
       },
     ],
-    user: {
+    author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Please Author is required'],
