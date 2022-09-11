@@ -15,7 +15,9 @@ const {
   sendEmail,
   EMAIL_TEMPLATE_NAME,
   uploadImgToCloudinary,
+  resizePhoto,
 } = require('../utils');
+const multer = require('multer');
 
 // get all users
 const getAllUsers = expressAsyncHandler(async (req, res) => {
@@ -41,7 +43,7 @@ const getUserDetails = expressAsyncHandler(async (req, res) => {
 
 // get logged-in user details
 const getUserProfile = expressAsyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate('posts');
   res.status(StatusCodes.OK).json(user);
 });
 
@@ -308,13 +310,18 @@ const resetPassword = expressAsyncHandler(async (req, res, next) => {
 
 const uploadProfileUpload = expressAsyncHandler(async (req, res, next) => {
   try {
-    console.log(req.file.filename);
-    //1. Get the oath to img
-    const localPath = path.join(
-      'public/images/profile',
-      `${req.file.filename}`,
-    );
-    //2.Upload to cloudinary
+    if (!req.file) {
+      return next(new NotFoundError('No file is found to update!'));
+    }
+
+    // 1. resize and save to local path
+    const filePath = 'public/images';
+    await resizePhoto(req.file, filePath);
+
+    // 2. Get the oath to img
+    const localPath = path.join(`${filePath}`, `${req.file.filename}`);
+
+    // 3.Upload to cloudinary
     const imgUploaded = await uploadImgToCloudinary(localPath);
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -323,11 +330,17 @@ const uploadProfileUpload = expressAsyncHandler(async (req, res, next) => {
       { new: true },
     );
 
+    // 4. remove file fom localPath
     fs.unlinkSync(localPath);
 
     res.status(StatusCodes.OK).json(updatedUser);
   } catch (error) {
     logger.error(error);
+
+    if (error instanceof multer.MulterError) {
+      return next(new BadRequestError(error));
+    }
+
     return next(error);
   }
 });

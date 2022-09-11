@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const { dbConnect } = require('./config');
-const { authRoutes, userRoutes } = require('./routes');
+const { authRoutes, userRoutes, postRoutes } = require('./routes');
 const logger = require('./logger');
 const {
   routeNotFoundMiddleware,
@@ -16,6 +16,7 @@ dbConnect();
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(
@@ -28,6 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 // auth route
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/posts', postRoutes);
 
 // error handler
 app.use(routeNotFoundMiddleware);
