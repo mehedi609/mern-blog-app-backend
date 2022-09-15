@@ -1,0 +1,121 @@
+[
+  {
+    "_id": "631bb474815534aa17fc6841",
+    "firstName": "Mehedi",
+    "lastName": "Hasan",
+    "profilePhoto": "https://res.cloudinary.com/mehedi-export-import/image/upload/v1662876125/vqygvhjk1dgq2sg81kxl.jpg",
+    "email": "mehedi@gmail.com",
+    "password": "password",
+    "postCount": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "isFollowing": false,
+    "isUnFollowing": false,
+    "isAccountVerified": true,
+    "viewedBy": [],
+    "followers": [
+      "631bb48d815534aa17fc6844",
+      "631bb49f815534aa17fc6847",
+      "631bb4b1815534aa17fc684a"
+    ],
+    "following": [
+      "631bb48d815534aa17fc6844",
+      "631bb4b1815534aa17fc684a",
+      "6322fb9463df569ff4df29ad"
+    ],
+    "active": false,
+    "__v": 0
+  },
+  {
+    "_id": "631bb48d815534aa17fc6844",
+    "firstName": "Zannatun",
+    "lastName": "Nyma",
+    "profilePhoto": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    "email": "nyma@gmail.com",
+    "password": "password",
+    "postCount": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "isFollowing": true,
+    "isUnFollowing": false,
+    "isAccountVerified": true,
+    "viewedBy": [],
+    "followers": [
+      "631bb474815534aa17fc6841",
+      "631bb4b1815534aa17fc684a",
+      "6322fb9463df569ff4df29ad"
+    ],
+    "following": ["631bb474815534aa17fc6841", "631bb4b1815534aa17fc684a"],
+    "active": false,
+    "__v": 0
+  },
+  {
+    "_id": "631bb49f815534aa17fc6847",
+    "firstName": "Sanzida",
+    "lastName": "Afrin",
+    "profilePhoto": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    "email": "sinthy@gmail.com",
+    "password": "password",
+    "postCount": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "isFollowing": false,
+    "isUnFollowing": false,
+    "isAccountVerified": true,
+    "viewedBy": [],
+    "followers": ["631bb4b1815534aa17fc684a", "6322fb9463df569ff4df29ad"],
+    "following": [
+      "631bb474815534aa17fc6841",
+      "631bb4b1815534aa17fc684a",
+      "6322fb9463df569ff4df29ad"
+    ],
+    "active": false,
+    "__v": 0
+  },
+  {
+    "_id": "631bb4b1815534aa17fc684a",
+    "firstName": "Nasima",
+    "lastName": "Akhter",
+    "profilePhoto": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    "email": "nasima@gmail.com",
+    "password": "password",
+    "postCount": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "isFollowing": false,
+    "isUnFollowing": false,
+    "isAccountVerified": true,
+    "viewedBy": [],
+    "followers": [
+      "631bb474815534aa17fc6841",
+      "631bb48d815534aa17fc6844",
+      "631bb49f815534aa17fc6847"
+    ],
+    "following": [
+      "631bb474815534aa17fc6841",
+      "631bb48d815534aa17fc6844",
+      "631bb49f815534aa17fc6847"
+    ],
+    "active": false,
+    "__v": 0
+  },
+  {
+    "_id": "6322fb9463df569ff4df29ad",
+    "firstName": "Rina",
+    "lastName": "Khan",
+    "profilePhoto": "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    "email": "rina@gmail.com",
+    "password": "password",
+    "postCount": 0,
+    "isBlocked": false,
+    "isAdmin": false,
+    "isFollowing": false,
+    "isUnFollowing": false,
+    "isAccountVerified": true,
+    "viewedBy": [],
+    "followers": ["631bb474815534aa17fc6841", "631bb49f815534aa17fc6847"],
+    "following": ["631bb48d815534aa17fc6844", "631bb49f815534aa17fc6847"],
+    "active": false,
+    "__v": 0
+  }
+]
