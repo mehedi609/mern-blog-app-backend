@@ -2,16 +2,21 @@ require('dotenv').config();
 const fs = require('fs');
 const User = require('./model/User');
 const { dbConnect } = require('./config');
+const { Category } = require('./model');
 
 dbConnect();
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/sample-data/user.json`, 'utf-8'),
+const users = JSON.parse(
+  fs.readFileSync(`${__dirname}/sample-data/users.json`, 'utf-8'),
+);
+const categories = JSON.parse(
+  fs.readFileSync(`${__dirname}/sample-data/categories.json`, 'utf-8'),
 );
 
 async function importData() {
   try {
-    await User.create(tours);
+    await User.create(users);
+    await Category.create(categories);
     console.log('Data imported successfully');
     process.exit();
   } catch (e) {
@@ -22,6 +27,7 @@ async function importData() {
 async function deleteData() {
   try {
     await User.deleteMany();
+    await Category.deleteMany();
     console.log('Data deleted successfully');
     process.exit();
   } catch (e) {

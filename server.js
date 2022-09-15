@@ -2,7 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const { dbConnect } = require('./config');
-const { authRoutes, userRoutes, postRoutes } = require('./routes');
+const {
+  authRoutes,
+  userRoutes,
+  postRoutes,
+  categoryRoutes,
+} = require('./routes');
 const logger = require('./logger');
 const {
   routeNotFoundMiddleware,
@@ -30,6 +35,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/posts', postRoutes);
+app.use('/api/v1/categories', categoryRoutes);
 
 // error handler
 app.use(routeNotFoundMiddleware);
