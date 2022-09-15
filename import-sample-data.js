@@ -2,7 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const User = require('./model/User');
 const { dbConnect } = require('./config');
-const { Category } = require('./model');
+const { Category, Post } = require('./model');
 
 dbConnect();
 
@@ -12,11 +12,15 @@ const users = JSON.parse(
 const categories = JSON.parse(
   fs.readFileSync(`${__dirname}/sample-data/categories.json`, 'utf-8'),
 );
+const posts = JSON.parse(
+  fs.readFileSync(`${__dirname}/sample-data/posts.json`, 'utf-8'),
+);
 
 async function importData() {
   try {
     await User.create(users);
     await Category.create(categories);
+    await Post.create(posts);
     console.log('Data imported successfully');
     process.exit();
   } catch (e) {
@@ -28,6 +32,7 @@ async function deleteData() {
   try {
     await User.deleteMany();
     await Category.deleteMany();
+    await Post.deleteMany();
     console.log('Data deleted successfully');
     process.exit();
   } catch (e) {
