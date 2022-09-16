@@ -26,7 +26,7 @@ exports.getAllCategories = expressAsyncHandler(async (req, res) => {
 // get category by id
 exports.getCategoryById = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const category = await Category.findOne({ id })
+  const category = await Category.findById(id)
     .populate('user')
     .sort('-createdAt');
 
@@ -39,8 +39,8 @@ exports.getCategoryById = expressAsyncHandler(async (req, res, next) => {
 // update category by id
 exports.updateCategoryById = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const updatedCategory = await Category.findOneAndUpdate(
-    { id },
+  const updatedCategory = await Category.findByIdAndUpdate(
+    id,
     {
       title: req?.body?.title,
     },
@@ -49,13 +49,21 @@ exports.updateCategoryById = expressAsyncHandler(async (req, res, next) => {
     },
   );
 
+  if (!updatedCategory) {
+    return next(new NotFoundError(`Category with id ${id} not found`));
+  }
+
   res.status(StatusCodes.OK).json(updatedCategory);
 });
 
 // delete category by id
 exports.deleteCategoryById = expressAsyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const category = await Category.findOneAndDelete({ id });
+  const category = await Category.findByIdAndDelete(id);
+
+  if (!category) {
+    return next(new NotFoundError(`Category with id ${id} not found`));
+  }
 
   res.status(StatusCodes.OK).json(category);
 });

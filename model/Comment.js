@@ -17,7 +17,15 @@ const commentSchema = new mongoose.Schema(
       required: [true, 'Comment description is required'],
     },
   },
-  { timestamps: true },
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+    timestamps: true,
+  },
 );
 
 // hide __v and _id properties
