@@ -9,7 +9,7 @@ const commentSchema = new mongoose.Schema(
       required: [true, 'Post is required'],
     },
     user: {
-      type: Object,
+      type: mongoose.Schema.Types.ObjectId,
       required: [true, 'User is required'],
     },
     description: {

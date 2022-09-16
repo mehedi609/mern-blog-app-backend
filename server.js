@@ -7,6 +7,7 @@ const {
   userRoutes,
   postRoutes,
   categoryRoutes,
+  commentRoutes
 } = require('./routes');
 const logger = require('./logger');
 const {
@@ -36,6 +37,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/comments', commentRoutes);
 
 // error handler
 app.use(routeNotFoundMiddleware);
